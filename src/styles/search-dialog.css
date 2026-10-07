@@ -145,14 +145,20 @@
 	height: 46px;
 	min-height: 46px;
 	margin: 0;
-	padding: 0 2.75rem 0 2.75rem;
+	padding: 0 3.25rem 0 3rem;
 	border: 1px solid var(--color-border-control);
 	border-radius: 8px;
 	background: #ffffff;
 	color: #18181b;
 	font: inherit;
 	font-size: 16px;
-	line-height: 1.4;
+	line-height: 1.25;
+	text-overflow: ellipsis;
+}
+
+#site-search-dialog .search-field input::placeholder {
+	color: #71717a;
+	opacity: 1;
 }
 
 #site-search-dialog .search-field input::-webkit-search-cancel-button {
@@ -415,7 +421,8 @@
 	#site-search-dialog .search-field input {
 		height: 48px;
 		min-height: 48px;
-		padding-right: 3.25rem;
+		line-height: 48px;
+		padding-right: 3.5rem;
 	}
 
 	#site-search-dialog .search-clear {

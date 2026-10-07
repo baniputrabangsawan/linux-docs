@@ -38,7 +38,43 @@ function scheduleClose(clip: HTMLElement): void {
 	clip.addEventListener('transitionend', onEnd);
 }
 
+const scrollHolds = new WeakMap<HTMLElement, () => void>();
+
+function preserveSidebarScroll(button: HTMLButtonElement, top: number): void {
+	const scroller = button.closest<HTMLElement>('#starlight__sidebar');
+	if (!scroller) return;
+	scrollHolds.get(scroller)?.();
+	if (scroller.scrollTop !== top) scroller.scrollTop = top;
+	let userMoved = false;
+	const markUser = (event: Event) => {
+		const target = event.target;
+		if (target instanceof Element && target.closest('[data-nav-toggle]')) return;
+		userMoved = true;
+	};
+	scroller.addEventListener('wheel', markUser, { passive: true });
+	scroller.addEventListener('touchmove', markUser, { passive: true });
+	scroller.addEventListener('pointerdown', markUser);
+	const started = performance.now();
+	let frame = 0;
+	const stop = () => {
+		cancelAnimationFrame(frame);
+		scroller.removeEventListener('wheel', markUser);
+		scroller.removeEventListener('touchmove', markUser);
+		scroller.removeEventListener('pointerdown', markUser);
+		scrollHolds.delete(scroller);
+	};
+	const tick = () => {
+		if (!userMoved && scroller.scrollTop !== top) scroller.scrollTop = top;
+		if (performance.now() - started < 280) frame = requestAnimationFrame(tick);
+		else stop();
+	};
+	scrollHolds.set(scroller, stop);
+	frame = requestAnimationFrame(tick);
+}
+
 function setExpanded(button: HTMLButtonElement, open: boolean): void {
+	const scroller = button.closest<HTMLElement>('#starlight__sidebar');
+	const scrollTop = scroller?.scrollTop ?? 0;
 	button.setAttribute('aria-expanded', open ? 'true' : 'false');
 	const panel = panelFor(button);
 	const clip = panel?.closest<HTMLElement>('[data-nav-clip]') ?? null;
@@ -52,6 +88,7 @@ function setExpanded(button: HTMLButtonElement, open: boolean): void {
 		clip.hidden = false;
 		if (motionReduced()) {
 			clip.dataset.open = 'true';
+			preserveSidebarScroll(button, scrollTop);
 			return;
 		}
 		if (wasHidden) {
@@ -59,10 +96,12 @@ function setExpanded(button: HTMLButtonElement, open: boolean): void {
 			void clip.offsetHeight;
 		}
 		clip.dataset.open = 'true';
+		preserveSidebarScroll(button, scrollTop);
 		return;
 	}
 	panel.inert = true;
 	clip.dataset.open = 'false';
+	preserveSidebarScroll(button, scrollTop);
 	if (motionReduced() || clip.hidden) {
 		clip.hidden = true;
 		return;

@@ -82,6 +82,10 @@ html[data-os='macos'] li:has(> [data-os-item]:not([data-platforms~='macos']):not
 	font-size: 0.875rem;
 }
 
+.os-banner .os-name {
+	margin-inline-start: 0.75rem;
+}
+
 .os-change {
 	color: #3f6212;
 	font-size: 0.875rem;

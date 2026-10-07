@@ -243,3 +243,73 @@ test('drawer mobile dan reduced motion tidak menyisakan ruang', async ({ page })
 	expect(reduced!.chevron === 'none' || reduced!.chevron === 'matrix(0, 1, -1, 0, 0, 0)').toBe(true);
 });
 
+test('kategori pemicu tidak naik saat submenu membuka ke bawah', async ({ page }) => {
+	await page.setViewportSize({ width: 1440, height: 620 });
+	await page.goto('/dashboard/?platform=all');
+	const result = await page.evaluate(async () => {
+		const scroller = document.getElementById('starlight__sidebar');
+		if (!scroller) return null;
+		const sample = async (id: string) => {
+			const button = document.querySelector<HTMLButtonElement>(`[aria-controls="${id}"]`);
+			const panel = document.getElementById(id);
+			const clip = panel?.closest<HTMLElement>('[data-nav-clip]');
+			const head = button?.closest('.nav-group-head');
+			const next = button?.closest('.nav-group')?.nextElementSibling;
+			if (!button || !clip || !head || !panel) return null;
+			const triggerBefore = button.getBoundingClientRect().top;
+			const scrollBefore = scroller.scrollTop;
+			const headBottom = head.getBoundingClientRect().bottom;
+			button.click();
+			const samples: Array<{ trigger: number; scroll: number; clipTop: number; clipHeight: number; nextTop: number | null }> = [];
+			const start = performance.now();
+			const { promise, resolve } = Promise.withResolvers<void>();
+			const frame = () => {
+				samples.push({
+					trigger: button.getBoundingClientRect().top,
+					scroll: scroller.scrollTop,
+					clipTop: clip.getBoundingClientRect().top,
+					clipHeight: clip.getBoundingClientRect().height,
+					nextTop: next instanceof HTMLElement ? next.getBoundingClientRect().top : null,
+				});
+				if (performance.now() - start < 260) requestAnimationFrame(frame);
+				else resolve();
+			};
+			requestAnimationFrame(frame);
+			await promise;
+			return {
+				triggerBefore,
+				scrollBefore,
+				headBottom,
+				samples,
+				transform: getComputedStyle(panel).transform,
+			};
+		};
+		const top = await sample('nav-articles-sistem-operasi');
+		scroller.scrollTop = 90;
+		const middle = await sample('nav-articles-jaringan');
+		scroller.scrollTop = scroller.scrollHeight;
+		const bottom = await sample('nav-articles-referensi-perintah');
+		return {
+			top,
+			middle,
+			bottom,
+			canScroll: scroller.scrollHeight > scroller.clientHeight + 8,
+		};
+	});
+	expect(result).not.toBeNull();
+	expect(result!.canScroll).toBe(true);
+	for (const run of [result!.top, result!.middle, result!.bottom]) {
+		expect(run).not.toBeNull();
+		expect(run!.transform).toBe('none');
+		expect(run!.samples.length).toBeGreaterThan(3);
+		for (const sample of run!.samples) {
+			expect(Math.abs(sample.trigger - run!.triggerBefore)).toBeLessThan(1.5);
+			expect(Math.abs(sample.scroll - run!.scrollBefore)).toBeLessThan(1.5);
+			expect(Math.abs(sample.clipTop - run!.headBottom)).toBeLessThan(2);
+		}
+		expect(run!.samples.at(-1)!.clipHeight).toBeGreaterThan(run!.samples[0].clipHeight + 8);
+		const nextTops = run!.samples.map((sample) => sample.nextTop).filter((value): value is number => value !== null);
+		if (nextTops.length > 1) expect(nextTops.at(-1)!).toBeGreaterThan(nextTops[0] + 8);
+	}
+});
+

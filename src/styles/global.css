@@ -22,6 +22,32 @@ main {
 .header,
 .sidebar-pane {
 	background: var(--color-bg);
+	overflow-anchor: none;
+}
+
+html,
+.sidebar-pane {
+	scrollbar-width: thin;
+	scrollbar-color: #a1a1aa transparent;
+}
+
+html::-webkit-scrollbar,
+.sidebar-pane::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+html::-webkit-scrollbar-thumb,
+.sidebar-pane::-webkit-scrollbar-thumb {
+	border: 1px solid transparent;
+	border-radius: 999px;
+	background: #a1a1aa;
+	background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-track,
+.sidebar-pane::-webkit-scrollbar-track {
+	background: transparent;
 }
 
 .content-panel {

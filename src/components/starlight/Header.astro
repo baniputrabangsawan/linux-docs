@@ -1,0 +1,44 @@
+---
+import { getCategory } from '../../config/categories';
+import { site } from '../../config/site';
+import OutlineIcon from '../ui/OutlineIcon.astro';
+import Search from './Search.astro';
+
+const route = Astro.locals.starlightRoute;
+const id = route.id;
+const isHome = id === 'dashboard';
+const kind = 'kind' in route.entry.data ? route.entry.data.kind : undefined;
+const category = getCategory(id.split('/').filter(Boolean)[0]);
+const isCategoryPage = kind === 'category';
+const crumbs: { label: string; href?: string }[] = [
+	{ label: 'Beranda', href: isHome ? undefined : '/dashboard/' },
+];
+if (category && !isHome) {
+	crumbs.push({
+		label: category.label,
+		href: isCategoryPage ? undefined : `/${category.slug}/`,
+	});
+}
+if (!isHome && !isCategoryPage) {
+	crumbs.push({ label: route.entry.data.title });
+}
+---
+
+<div class="site-header">
+	<a class="brand-mobile" href="/dashboard/">
+		<OutlineIcon name="mark" size={28} />
+		<span>{site.name}</span>
+	</a>
+	<nav class="breadcrumbs" aria-label="Jejak navigasi">
+		<ol class="breadcrumb-list">
+			{
+				crumbs.map((crumb) => (
+					<li>
+						{crumb.href ? <a href={crumb.href}>{crumb.label}</a> : <span aria-current="page">{crumb.label}</span>}
+					</li>
+				))
+			}
+		</ol>
+	</nav>
+	<Search />
+</div>

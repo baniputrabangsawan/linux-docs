@@ -1,0 +1,33 @@
+---
+import { getCategory } from '../../config/categories';
+import { platformLabels, type Platform, type Status } from '../../config/labels';
+import { entryHref, type PublicArticle } from '../../lib/content';
+import { formatIsoDate } from '../../lib/format';
+import StatusBadge from '../ui/StatusBadge.astro';
+
+interface Props {
+	entry: PublicArticle;
+}
+
+const { entry } = Astro.props;
+const category = getCategory(entry.data.category);
+const platforms = entry.data.platforms.map((platform) => platformLabels[platform as Platform]).join(', ');
+---
+
+<article
+	class="article-card"
+	data-os-item
+	data-article-card
+	data-category={entry.data.category}
+	data-platforms={entry.data.platforms.join(' ')}
+	data-status={entry.data.status}
+>
+	<h3><a href={entryHref(entry.id)}>{entry.data.title}</a></h3>
+	<p>{entry.data.description}</p>
+	<ul class="badge-row">
+		<li><StatusBadge status={entry.data.status as Status} /></li>
+		<li class="platform-chip">{platforms}</li>
+		{category && <li class="platform-chip">{category.label}</li>}
+	</ul>
+	<p class="meta-line">Diperbarui {formatIsoDate(entry.data.updatedAt)}</p>
+</article>

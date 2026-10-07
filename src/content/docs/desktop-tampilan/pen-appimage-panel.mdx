@@ -1,0 +1,117 @@
+---
+title: Menambahkan Pen AppImage ke Panel Linux Mint
+sidebarLabel: Pen AppImage di panel
+description: Cara membuat peluncur desktop dan memakai ikon bawaan AppImage. Path serta lingkungan harus disesuaikan; proyek ini belum menguji hasilnya.
+category: desktop-tampilan
+kind: troubleshooting
+platforms: [linux]
+tags: [linux-mint, cinnamon, appimage, launcher, ikon]
+status: unverified
+updatedAt: "2026-10-06"
+sources:
+  - label: Integrasi desktop AppImage
+    url: https://docs.appimage.org/reference/desktop-integration.html
+  - label: Menjalankan AppImage
+    url: https://docs.appimage.org/user-guide/run-appimages.html
+related: []
+draft: false
+pagefind: true
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Masalah
+
+Berkas `Pen.AppImage` tidak muncul sebagai ikon di panel Cinnamon. Gejala yang sering terlihat:
+
+- pesan `AppImage tidak muncul di panel`;
+- berkas terbuka sebagai arsip, bukan aplikasi;
+- menu aplikasi tidak memuat entri Pen setelah berkas diunduh.
+
+Proyek ini tidak menjalankan langkah di bawah dan tidak memiliki bukti bahwa Pen muncul di panel.
+
+## Lingkungan
+
+Panduan ini mensyaratkan Linux dengan panel bergaya Cinnamon, berkas AppImage yang sudah Anda miliki, serta izin menulis di direktori rumah. Nama distro, rilis, arsitektur, dan versi Pen harus Anda catat sendiri. Jangan menganggap langkah ini berlaku untuk seluruh Linux atau untuk Linux Mint secara umum.
+
+Ganti setiap `/home/pengguna` dengan path rumah Anda. Berkas desktop tidak memperluas `$HOME` atau `~`.
+
+## Diagnosis
+
+Periksa tiga hal sebelum mengubah sistem:
+
+1. Apakah berkas AppImage ada di lokasi yang Anda pilih?
+2. Apakah izin eksekusi aktif?
+3. Apakah ada berkas `.desktop` di `~/.local/share/applications`?
+
+Dugaan yang belum dikonfirmasi: panel tidak menampilkan Pen karena belum ada peluncur, atau ikon menunjuk ke path yang tidak ada. Itu bukan penyebab yang dibuktikan oleh proyek ini.
+
+## Penyebab
+
+Penyebab final belum dikonfirmasi. Dokumentasi AppImage menjelaskan bahwa integrasi desktop membutuhkan peluncur dan ikon, tetapi halaman ini tidak membuktikan bahwa itulah penyebab pada mesin tertentu.
+
+## Langkah penyelesaian
+
+<Aside type="caution" title="Dampak">
+Perintah berikut mengubah izin satu berkas dan menambah berkas peluncur di direktori rumah. Perintah ini tidak menghapus data, tetapi path yang salah dapat mengubah berkas lain. Sesuaikan path sebelum menjalankannya.
+</Aside>
+
+Jadikan berkas dapat dijalankan:
+
+```bash
+chmod +x /home/pengguna/Applications/Pen.AppImage
+```
+
+Ekstrak isi AppImage hanya untuk menemukan ikon bawaannya. Jangan mengunduh ikon dari situs lain.
+
+```bash
+cd /home/pengguna/Applications
+./Pen.AppImage --appimage-extract
+```
+
+Cari berkas ikon di dalam `squashfs-root`, misalnya `.DirIcon` atau PNG di pohon ikon. Salin ikon itu ke direktori ikon pengguna, lalu hapus hasil ekstraksi jika Anda tidak lagi membutuhkannya. Nama berkas ikon pada AppImage Pen harus Anda cocokkan sendiri.
+
+```bash
+mkdir -p /home/pengguna/.local/share/applications /home/pengguna/.local/share/icons
+cp squashfs-root/.DirIcon /home/pengguna/.local/share/icons/pen.png
+```
+
+Buat peluncur. Nilai `Icon` menunjuk ke ikon yang disalin dari AppImage, bukan ke logo pihak ketiga.
+
+```ini title="pen.desktop"
+[Desktop Entry]
+Type=Application
+Name=Pen
+Comment=Peluncur lokal untuk berkas AppImage Pen
+Exec=/home/pengguna/Applications/Pen.AppImage
+Icon=/home/pengguna/.local/share/icons/pen
+Terminal=false
+Categories=Graphics;
+StartupNotify=true
+```
+
+Simpan berkas itu sebagai `/home/pengguna/.local/share/applications/pen.desktop`. Pada Cinnamon, buka menu aplikasi, cari Pen, lalu tambahkan ke panel lewat menu konteks entri tersebut. Letak menu dapat berbeda antar rilis.
+
+## Verifikasi
+
+Belum ada hasil verifikasi dari proyek ini. Di mesin Anda, periksa apakah entri Pen muncul di menu dan apakah ikon panel membuka berkas AppImage yang sama. Jika ikon kosong, path `Icon` masih salah.
+
+## Pemulihan
+
+Hapus hanya berkas yang dibuat halaman ini:
+
+```bash
+rm /home/pengguna/.local/share/applications/pen.desktop
+rm /home/pengguna/.local/share/icons/pen.png
+chmod -x /home/pengguna/Applications/Pen.AppImage
+```
+
+<Aside type="danger" title="Dampak penghapusan">
+`rm` menghapus berkas pada path yang tertulis. Jangan menggantinya dengan `rm -rf` atau path direktori induk.
+</Aside>
+
+## Sumber dan batas penerapan
+
+Path, nama berkas ikon, dan cara menambahkan item ke panel harus disesuaikan. Status artikel ini **Belum terverifikasi**.

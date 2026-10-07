@@ -1,0 +1,29 @@
+---
+import type { Category } from '../../config/categories';
+import { osChoices, type OsChoice } from '../../lib/os-preference';
+import OutlineIcon from '../ui/OutlineIcon.astro';
+
+interface Props {
+	category: Category;
+	counts: Record<OsChoice, number>;
+}
+
+const { category, counts } = Astro.props;
+---
+
+<article class="category-card">
+	<div class="card-icon" aria-hidden="true">
+		<OutlineIcon name={category.icon} />
+	</div>
+	<h3><a href={`/${category.slug}/`}>{category.label}</a></h3>
+	<p>{category.description}</p>
+	<p class="card-count">
+		{
+			osChoices.map((choice) => (
+				<span class="os-count" data-os-count={choice}>
+					{counts[choice] === 0 ? 'Belum ada artikel' : `${counts[choice]} artikel publik`}
+				</span>
+			))
+		}
+	</p>
+</article>

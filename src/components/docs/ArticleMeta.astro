@@ -1,0 +1,52 @@
+---
+import { platformLabels, type Platform } from '../../config/labels';
+import { isArticleKind } from '../../config/labels';
+import type { ArticleFields } from '../../lib/content';
+import { articleMatchesOs, osChoices, osLabels } from '../../lib/os-preference';
+import { formatIsoDate } from '../../lib/format';
+import StatusBadge from '../ui/StatusBadge.astro';
+
+const data = Astro.locals.starlightRoute.entry.data;
+if (!isArticleKind(data.kind)) return;
+const article = data as ArticleFields;
+---
+
+<div class="article-meta">
+	<ul class="badge-row">
+		<li><StatusBadge status={article.status} /></li>
+		{
+			article.platforms.map((platform) => (
+				<li class="platform-chip">{platformLabels[platform as Platform]}</li>
+			))
+		}
+	</ul>
+	<ul class="meta-row">
+		<li class="meta-line">Diperbarui {formatIsoDate(article.updatedAt)}</li>
+		{article.testedAt && <li class="meta-line">Diuji {formatIsoDate(article.testedAt)}</li>}
+	</ul>
+	{
+		article.testedEnvironment && (
+			<p class="meta-line">
+				<strong>Lingkungan:</strong> {article.testedEnvironment}
+			</p>
+		)
+	}
+	{
+		!article.testedEnvironment && article.status !== 'verified' && (
+			<p class="meta-line">
+				Belum ada lingkungan pengujian yang dicatat. Sesuaikan path dan versi sebelum menerapkan langkah.
+			</p>
+		)
+	}
+	{
+		osChoices
+			.filter((choice) => choice !== 'all' && !articleMatchesOs(article.platforms, choice))
+			.map((choice) => (
+				<p class="os-mismatch" data-os-mismatch={choice}>
+					Preferensi Anda {osLabels[choice]}. Artikel ini untuk{' '}
+					{article.platforms.map((platform) => platformLabels[platform as Platform]).join(', ')}. Artikel tetap
+					ditampilkan.
+				</p>
+			))
+	}
+</div>

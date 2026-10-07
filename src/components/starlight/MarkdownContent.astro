@@ -1,0 +1,22 @@
+---
+import { isArticleKind } from '../../config/labels';
+import RelatedArticles from '../docs/RelatedArticles.astro';
+import SearchMetadata from '../docs/SearchMetadata.astro';
+import Sources from '../docs/Sources.astro';
+
+const kind = Astro.locals.starlightRoute.entry.data.kind;
+const isArticle = isArticleKind(kind);
+---
+
+{isArticle && <SearchMetadata />}
+<div class:list={['sl-markdown-content', { 'is-article': isArticle }]}>
+	<slot />
+</div>
+{isArticle && <Sources />}
+{isArticle && <RelatedArticles />}
+
+<script>
+	import { initClipboard } from '../../scripts/clipboard';
+
+	initClipboard();
+</script>

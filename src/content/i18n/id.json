@@ -1,0 +1,18 @@
+{
+  "heading.anchorLabel": "Bagian berjudul “{{title}}”",
+  "page.draft": "Konten ini masih draf dan tidak ikut build produksi.",
+  "fileTree.directory": "Direktori",
+  "expressiveCode.copyButtonCopied": "Berhasil disalin",
+  "expressiveCode.copyButtonTooltip": "Salin kode",
+  "expressiveCode.terminalWindowFallbackTitle": "Jendela terminal",
+  "pagefind.clear_search": "Bersihkan",
+  "pagefind.load_more": "Muat lebih banyak hasil",
+  "pagefind.search_label": "Cari dokumentasi",
+  "pagefind.filters_label": "Filter",
+  "pagefind.zero_results": "Tidak ada hasil untuk [SEARCH_TERM]",
+  "pagefind.many_results": "[COUNT] hasil untuk [SEARCH_TERM]",
+  "pagefind.one_result": "[COUNT] hasil untuk [SEARCH_TERM]",
+  "pagefind.alt_search": "Tidak ada hasil untuk [SEARCH_TERM]. Menampilkan hasil untuk [DIFFERENT_TERM]",
+  "pagefind.search_suggestion": "Tidak ada hasil untuk [SEARCH_TERM]. Coba pencarian berikut:",
+  "pagefind.searching": "Mencari [SEARCH_TERM]..."
+}

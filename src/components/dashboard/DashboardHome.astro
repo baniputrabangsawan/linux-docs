@@ -1,0 +1,123 @@
+---
+import { categories } from '../../config/categories';
+import { getPublicArticles } from '../../lib/content';
+import { articleMatchesOs, countByOs, osChoices, osLabels, type OsChoice } from '../../lib/os-preference';
+import ArticleCard from './ArticleCard.astro';
+import CategoryCard from './CategoryCard.astro';
+
+const articles = await getPublicArticles();
+const articleCounts = countByOs(articles.map((entry) => ({ platforms: entry.data.platforms })));
+const categoryCounts = Object.fromEntries(
+	categories.map((category) => {
+		const inCategory = articles.filter((entry) => entry.data.category === category.slug);
+		return [category.slug, countByOs(inCategory.map((entry) => ({ platforms: entry.data.platforms })))];
+	}),
+) as Record<string, Record<OsChoice, number>>;
+const recentByOs = Object.fromEntries(
+	osChoices.map((choice) => [
+		choice,
+		articles.filter((entry) => articleMatchesOs(entry.data.platforms, choice)).slice(0, 5),
+	]),
+) as Record<OsChoice, typeof articles>;
+---
+
+<div class="dashboard">
+	<div class="os-banner">
+		<p>
+			Platform aktif:
+			{
+				osChoices.map((choice) => (
+					<strong class="os-name" data-os-name={choice}>
+						{osLabels[choice]}
+					</strong>
+				))
+			}
+		</p>
+		<a class="os-change" href="/?change=1">Ganti sistem operasi</a>
+	</div>
+	<noscript>
+		<p class="os-note">
+			Penyaringan menurut sistem operasi membutuhkan JavaScript. Semua artikel publik ditampilkan. Pilihan tetap
+			dapat dibuka lewat tautan dengan query platform.
+		</p>
+	</noscript>
+
+	<section aria-labelledby="ringkasan-dokumentasi">
+		<h2 id="ringkasan-dokumentasi" class="section-title">Ringkasan</h2>
+		<div class="stat-row">
+			<article class="stat-card">
+				<span>Artikel publik</span>
+				<strong>
+					{
+						osChoices.map((choice) => (
+							<span class="os-count" data-os-count={choice} data-article-count={articleCounts[choice]}>
+								{articleCounts[choice]}
+							</span>
+						))
+					}
+				</strong>
+			</article>
+			<article class="stat-card">
+				<span>Kategori berisi artikel</span>
+				<strong>
+					{
+						osChoices.map((choice) => (
+							<span class="os-count" data-os-count={choice} data-category-count={categories.filter((category) => categoryCounts[category.slug][choice] > 0).length}>
+								{categories.filter((category) => categoryCounts[category.slug][choice] > 0).length}
+							</span>
+						))
+					}
+				</strong>
+			</article>
+		</div>
+	</section>
+
+	<section aria-labelledby="artikel-terbaru">
+		<h2 id="artikel-terbaru" class="section-title">Artikel terbaru</h2>
+		{
+			osChoices.map((choice) =>
+				recentByOs[choice].length === 0 ? (
+					<p class="os-empty" data-os-empty={choice}>
+						Belum ada artikel untuk {osLabels[choice]}.
+					</p>
+				) : (
+					<ul class="article-list" data-os-list={choice}>
+						{recentByOs[choice].map((entry) => (
+							<li>
+								<ArticleCard entry={entry} />
+							</li>
+						))}
+					</ul>
+				),
+			)
+		}
+	</section>
+
+	<section aria-labelledby="daftar-kategori">
+		<h2 id="daftar-kategori" class="section-title">Kategori</h2>
+		<ul class="card-grid">
+			{
+				categories.map((category) => (
+					<li
+						class="category-card-item"
+						data-visible-linux={categoryCounts[category.slug].linux}
+						data-visible-windows={categoryCounts[category.slug].windows}
+						data-visible-macos={categoryCounts[category.slug].macos}
+						data-visible-all={categoryCounts[category.slug].all}
+					>
+						<CategoryCard category={category} counts={categoryCounts[category.slug]} />
+					</li>
+				))
+			}
+		</ul>
+		{
+			osChoices.map((choice) =>
+				categories.every((category) => categoryCounts[category.slug][choice] === 0) ? (
+					<p class="os-empty" data-os-empty={choice}>
+						Belum ada kategori dengan artikel untuk {osLabels[choice]}.
+					</p>
+				) : null,
+			)
+		}
+	</section>
+</div>

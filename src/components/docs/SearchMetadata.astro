@@ -1,0 +1,18 @@
+---
+import { isPublicArticle } from '../../lib/content';
+import { searchMetadata } from '../../lib/search-metadata';
+
+const entry = Astro.locals.starlightRoute.entry;
+if (!isPublicArticle(entry)) return;
+const items = searchMetadata(entry);
+---
+
+<div class="search-metadata" data-pagefind-ignore hidden>
+	{
+		items.map((item) => (
+			<span data-pagefind-filter={item.filter} data-pagefind-meta={item.meta}>
+				{item.text}
+			</span>
+		))
+	}
+</div>

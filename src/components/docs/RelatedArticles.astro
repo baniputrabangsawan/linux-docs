@@ -1,0 +1,25 @@
+---
+import { isArticleKind } from '../../config/labels';
+import { getPublicArticles, entryHref, isPublicArticle } from '../../lib/content';
+import { resolveRelated } from '../../lib/related';
+
+const entry = Astro.locals.starlightRoute.entry;
+if (!isPublicArticle(entry) || !isArticleKind(entry.data.kind)) return;
+const related = resolveRelated(entry, await getPublicArticles());
+---
+
+{
+	related.length > 0 && (
+		<section class="related-articles" aria-labelledby="artikel-terkait">
+			<h2 id="artikel-terkait">Artikel terkait</h2>
+			<ul class="article-list">
+				{related.map((item) => (
+					<li>
+						<a href={entryHref(item.id)}>{item.data.title}</a>
+						<p>{item.data.description}</p>
+					</li>
+				))}
+			</ul>
+		</section>
+	)
+}

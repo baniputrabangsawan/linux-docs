@@ -1,0 +1,124 @@
+---
+import OutlineIcon from '../components/ui/OutlineIcon.astro';
+import { site } from '../config/site';
+import { OS_STORAGE_KEY, osChoices } from '../lib/os-preference';
+import '../styles/tokens.css';
+import '../styles/os-select.css';
+
+const storageKey = OS_STORAGE_KEY;
+const choices = osChoices.join(',');
+---
+
+<html lang={site.lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Pilih sistem operasi | {site.name}</title>
+		<meta name="description" content="Dokumentasi akan disesuaikan dengan pilihan Anda." />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<script is:inline define:vars={{ storageKey, choices }}>
+			(function () {
+				var allowed = choices.split(',');
+				function readNamed(name) {
+					try {
+						return window[name].getItem(storageKey);
+					} catch (error) {
+						return null;
+					}
+				}
+				function writeNamed(name, value) {
+					try {
+						window[name].setItem(storageKey, value);
+						return true;
+					} catch (error) {
+						return false;
+					}
+				}
+				var params = new URLSearchParams(location.search);
+				if (params.get('change') === '1') return;
+				var navigation = performance.getEntriesByType('navigation')[0];
+				if (navigation && navigation.type === 'back_forward') return;
+				var query = params.get('platform');
+				if (allowed.indexOf(query) !== -1) {
+					writeNamed('localStorage', query) || writeNamed('sessionStorage', query);
+					location.replace('/dashboard/?platform=' + encodeURIComponent(query));
+					return;
+				}
+				var stored = readNamed('localStorage') || readNamed('sessionStorage');
+				if (allowed.indexOf(stored) !== -1) location.replace('/dashboard/');
+			})();
+		</script>
+	</head>
+	<body>
+		<main class="os-page">
+			<a class="os-brand" href="/">
+				<OutlineIcon name="mark" size={28} />
+				<span>{site.name}</span>
+			</a>
+			<h1>Pilih sistem operasi</h1>
+			<p class="os-lead">Dokumentasi akan disesuaikan dengan pilihan Anda.</p>
+			<ul class="os-grid">
+				<li>
+					<a class="os-card" href="/dashboard/?platform=linux" data-os-choice="linux">
+						<span class="os-card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="4" width="18" height="12" rx="2"></rect>
+								<path d="M8 20h8M12 16v4M8 9h.01M12 9h4"></path>
+							</svg>
+						</span>
+						<strong>Linux</strong>
+						<span>Artikel untuk Linux, plus artikel yang berlaku di semua platform.</span>
+					</a>
+				</li>
+				<li>
+					<a class="os-card" href="/dashboard/?platform=windows" data-os-choice="windows">
+						<span class="os-card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="4" width="18" height="14" rx="1.5"></rect>
+								<path d="M3 9h18M8 20h8"></path>
+							</svg>
+						</span>
+						<strong>Windows</strong>
+						<span>Artikel untuk Windows, plus artikel yang berlaku di semua platform.</span>
+					</a>
+				</li>
+				<li>
+					<a class="os-card" href="/dashboard/?platform=macos" data-os-choice="macos">
+						<span class="os-card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="4" y="3" width="16" height="12" rx="1.5"></rect>
+								<path d="M8 19h8M9 15v4M15 15v4"></path>
+							</svg>
+						</span>
+						<strong>macOS</strong>
+						<span>Artikel untuk macOS, plus artikel yang berlaku di semua platform.</span>
+					</a>
+				</li>
+				<li>
+					<a class="os-card" href="/dashboard/?platform=all" data-os-choice="all">
+						<span class="os-card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="3" width="7.5" height="7.5" rx="1.2"></rect>
+								<rect x="13.5" y="3" width="7.5" height="7.5" rx="1.2"></rect>
+								<rect x="3" y="13.5" width="7.5" height="7.5" rx="1.2"></rect>
+								<rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.2"></rect>
+							</svg>
+						</span>
+						<strong>Semua platform</strong>
+						<span>Tampilkan seluruh artikel publik, tanpa menyaring sistem operasi.</span>
+					</a>
+				</li>
+			</ul>
+		</main>
+		<script>
+			import { isOsChoice, writeStoredOs } from '../lib/os-preference';
+
+			document.querySelectorAll<HTMLAnchorElement>('[data-os-choice]').forEach((link) => {
+				link.addEventListener('click', () => {
+					const value = link.dataset.osChoice;
+					if (isOsChoice(value)) writeStoredOs(value);
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,73 @@
+/*
+ * Starlight 0.42.5 menulis data-theme="dark" pada <html> sebelum skrip tema berjalan.
+ * Token light dipasang pada kedua nilai agar system dark tetap menampilkan UI terang.
+ * Hijau #87CF3E tidak dipakai sebagai teks atau isi tombol bertuliskan putih.
+ */
+:root,
+:root[data-theme='light'],
+:root[data-theme='dark'] {
+	color-scheme: light;
+	--sl-color-white: var(--color-text);
+	--sl-color-black: var(--color-bg);
+	--sl-color-gray-1: var(--color-text);
+	--sl-color-gray-2: var(--color-text-secondary);
+	--sl-color-gray-3: var(--color-text-muted);
+	--sl-color-gray-4: var(--color-text-muted);
+	--sl-color-gray-5: var(--color-border);
+	--sl-color-gray-6: var(--color-surface-muted);
+	--sl-color-gray-7: var(--color-canvas);
+	--sl-color-accent-low: var(--color-primary-soft);
+	--sl-color-accent: var(--color-primary);
+	--sl-color-accent-high: var(--color-primary);
+	--sl-color-text: var(--color-text);
+	--sl-color-text-accent: var(--color-primary);
+	--sl-color-text-invert: var(--color-on-primary);
+	--sl-color-bg: var(--color-bg);
+	--sl-color-bg-nav: var(--color-bg);
+	--sl-color-bg-sidebar: var(--color-bg);
+	--sl-color-bg-inline-code: var(--color-surface-muted);
+	--sl-color-bg-accent: var(--color-primary);
+	--sl-color-hairline: var(--color-border);
+	--sl-color-hairline-light: var(--color-border);
+	--sl-color-hairline-shade: var(--color-border);
+	--sl-color-backdrop-overlay: var(--color-overlay);
+	--sl-color-green: var(--color-success);
+	--sl-color-green-high: var(--color-success);
+	--sl-color-green-low: var(--color-success-bg);
+	--sl-color-orange: var(--color-warning);
+	--sl-color-orange-high: var(--color-warning);
+	--sl-color-orange-low: var(--color-warning-bg);
+	--sl-color-red: var(--color-danger);
+	--sl-color-red-high: var(--color-danger);
+	--sl-color-red-low: var(--color-danger-bg);
+	--sl-color-blue: var(--color-primary);
+	--sl-color-blue-high: var(--color-primary);
+	--sl-color-blue-low: var(--color-primary-soft);
+	--sl-font: var(--font-sans);
+	--sl-font-mono: var(--font-mono);
+	--sl-nav-height: var(--header-height);
+	--sl-sidebar-width: var(--sidebar-width);
+	--sl-content-width: var(--content-max);
+	--sl-text-h1: 1.75rem;
+	--sl-text-h2: 1.375rem;
+	--sl-text-h3: 1.25rem;
+	--sl-text-h4: 1rem;
+	--sl-text-body: 1rem;
+	--sl-line-height: 1.75;
+	--sl-line-height-headings: 1.25;
+	--sl-menu-button-size: var(--touch-target);
+	--sl-shadow-sm: var(--shadow-card);
+	--sl-shadow-lg: var(--shadow-modal);
+}
+
+@media (min-width: 50rem) {
+	:root,
+	:root[data-theme='light'],
+	:root[data-theme='dark'] {
+		--sl-nav-height: var(--header-height);
+		--sl-text-h1: 2rem;
+		--sl-text-h2: 1.5rem;
+		--sl-text-h3: 1.25rem;
+		--sl-text-h4: 1rem;
+	}
+}

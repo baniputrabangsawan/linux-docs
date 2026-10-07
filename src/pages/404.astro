@@ -1,0 +1,30 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { categories } from '../config/categories';
+import { site } from '../config/site';
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'Halaman tidak ditemukan',
+		description: 'Alamat ini tidak ada dalam dokumentasi publik.',
+		kind: 'overview',
+		pagefind: false,
+		template: 'doc',
+	}}
+>
+	<p>Periksa alamat atau kembali ke beranda. Pencarian tersedia setelah halaman dimuat.</p>
+	<p>
+		<a href="/">Kembali ke {site.name}</a>
+	</p>
+	<h2>Kategori</h2>
+	<ul>
+		{
+			categories.map((category) => (
+				<li>
+					<a href={`/${category.slug}/`}>{category.label}</a>
+				</li>
+			))
+		}
+	</ul>
+</StarlightPage>

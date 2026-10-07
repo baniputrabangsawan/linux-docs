@@ -1,0 +1,47 @@
+---
+import { OS_STORAGE_KEY, osChoices } from '../../lib/os-preference';
+
+const storageKey = OS_STORAGE_KEY;
+const choices = osChoices.join(',');
+---
+
+<script is:inline define:vars={{ storageKey, choices }}>
+	document.documentElement.dataset.theme = 'light';
+	document.documentElement.style.colorScheme = 'light';
+	(function () {
+		var allowed = choices.split(',');
+		function readNamed(name) {
+			try {
+				return window[name].getItem(storageKey);
+			} catch (error) {
+				return null;
+			}
+		}
+		function writeNamed(name, value) {
+			try {
+				window[name].setItem(storageKey, value);
+				return true;
+			} catch (error) {
+				return false;
+			}
+		}
+		var params = new URLSearchParams(location.search);
+		var query = params.get('platform');
+		var queryOk = allowed.indexOf(query) !== -1 ? query : '';
+		var stored = readNamed('localStorage') || readNamed('sessionStorage');
+		var storedOk = allowed.indexOf(stored) !== -1 ? stored : '';
+		var choice = queryOk || storedOk;
+		var path = location.pathname.replace(/\/$/, '') || '/';
+		if (path === '/dashboard' && !choice) {
+			location.replace('/');
+			return;
+		}
+		if (!choice) return;
+		document.documentElement.dataset.os = choice;
+		if (queryOk) writeNamed('localStorage', queryOk) || writeNamed('sessionStorage', queryOk);
+		if (path === '/dashboard' && query !== choice) {
+			params.set('platform', choice);
+			history.replaceState(null, '', location.pathname + '?' + params.toString());
+		}
+	})();
+</script>

@@ -1,0 +1,132 @@
+---
+import { categories } from '../../config/categories';
+import { site } from '../../config/site';
+import { entryHref, getPublicArticles } from '../../lib/content';
+import { articleMatchesOs } from '../../lib/os-preference';
+import OutlineIcon from '../ui/OutlineIcon.astro';
+const articles = await getPublicArticles();
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+function matches(href: string): boolean {
+	const normalized = href.replace(/\/$/, '') || '/';
+	return current === normalized;
+}
+
+function categoryOpen(slug: string): boolean {
+	return current === `/${slug}` || current.startsWith(`/${slug}/`);
+}
+---
+
+<div class="site-sidebar" data-site-sidebar>
+	<a class="brand" href="/dashboard/">
+		<OutlineIcon name="mark" size={28} />
+		<span>{site.name}</span>
+	</a>
+	<button
+		type="button"
+		class="search-trigger"
+		data-search-open
+		aria-keyshortcuts="Control+K Meta+K"
+		aria-haspopup="dialog"
+	>
+		<OutlineIcon name="search" />
+		<span class="search-label-full">Cari dokumentasi</span>
+		<span class="search-label-short">Cari…</span>
+		<kbd data-search-kbd aria-hidden="true"><kbd data-search-mod>Ctrl</kbd> <kbd>K</kbd></kbd>
+	</button>
+	<nav aria-label="Utama">
+		<ul class="nav-home">
+			<li>
+				<a class="nav-home-link" href="/dashboard/" aria-current={matches('/dashboard') ? 'page' : undefined}>
+					<OutlineIcon name="home" />
+					<span>Beranda</span>
+				</a>
+			</li>
+		</ul>
+		<p class="nav-label">Kategori</p>
+		<ul class="nav-groups">
+			{
+				categories.map((category) => {
+					const href = `/${category.slug}/`;
+					const nested = articles.filter((entry) => entry.data.category === category.slug);
+					const panelId = `nav-articles-${category.slug}`;
+					const open = categoryOpen(category.slug);
+					const categoryCurrent = matches(href);
+					return (
+						<li
+							class="nav-group"
+							data-visible-linux={nested.some((entry) => articleMatchesOs(entry.data.platforms, 'linux')) ? '1' : '0'}
+							data-visible-windows={nested.some((entry) => articleMatchesOs(entry.data.platforms, 'windows')) ? '1' : '0'}
+							data-visible-macos={nested.some((entry) => articleMatchesOs(entry.data.platforms, 'macos')) ? '1' : '0'}
+							data-visible-all={nested.length > 0 ? '1' : '0'}
+						>
+							<div class="nav-group-head">
+								<a class="nav-category" href={href} aria-current={categoryCurrent ? 'page' : undefined}>
+									<OutlineIcon name={category.icon} />
+									<span>{category.label}</span>
+								</a>
+								{
+									nested.length > 0 && (
+										<button
+											type="button"
+											class="nav-toggle"
+											data-nav-toggle
+											data-category-label={category.label}
+											aria-expanded={open ? 'true' : 'false'}
+											aria-controls={panelId}
+											aria-label={
+												open
+													? `Tutup artikel ${category.label}`
+													: `Buka artikel ${category.label}`
+											}
+										>
+											<OutlineIcon name="chevron" />
+										</button>
+									)
+								}
+							</div>
+							{
+								nested.length > 0 && (
+									<div
+										class="nav-articles-clip"
+										data-nav-clip
+										data-open={open ? 'true' : 'false'}
+										hidden={!open}
+									>
+										<div class="nav-articles-measure">
+											<ul id={panelId} class="nav-articles" inert={!open}>
+												{nested.map((entry) => {
+													const articleHref = entryHref(entry.id);
+													const label = entry.data.sidebarLabel || entry.data.title;
+													return (
+														<li data-os-item data-platforms={entry.data.platforms.join(' ')}>
+															<a
+																class="nav-article"
+																href={articleHref}
+																aria-current={matches(articleHref) ? 'page' : undefined}
+																data-full-title={entry.data.title}
+																title={entry.data.title}
+															>
+																<span class="nav-article-label">{label}</span>
+															</a>
+														</li>
+													);
+												})}
+											</ul>
+										</div>
+									</div>
+								)
+							}
+						</li>
+					);
+				})
+			}
+		</ul>
+	</nav>
+</div>
+
+<script>
+	import { initSidebar } from '../../scripts/sidebar';
+
+	initSidebar();
+</script>

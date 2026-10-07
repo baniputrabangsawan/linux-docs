@@ -1,0 +1,24 @@
+---
+import { isArticleKind } from '../../config/labels';
+import type { ArticleFields } from '../../lib/content';
+
+const data = Astro.locals.starlightRoute.entry.data;
+if (!isArticleKind(data.kind)) return;
+const sources = (data as ArticleFields).sources ?? [];
+---
+
+{
+	sources.length > 0 && (
+		<section class="source-list" aria-labelledby="sumber-artikel">
+			<h2 id="sumber-artikel">Sumber</h2>
+			<ul>
+				{sources.map((source) => (
+					<li>
+						<a href={source.url}>{source.label}</a>
+					</li>
+				))}
+			</ul>
+			<p>Sumber menjelaskan referensi, bukan bukti bahwa langkah di halaman ini sudah diuji oleh proyek.</p>
+		</section>
+	)
+}

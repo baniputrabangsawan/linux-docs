@@ -1,0 +1,12 @@
+---
+import { isArticleKind } from '../../config/labels';
+import ArticleMeta from '../docs/ArticleMeta.astro';
+
+const data = Astro.locals.starlightRoute.entry.data;
+const kind = 'kind' in data ? data.kind : undefined;
+const showMeta = isArticleKind(kind);
+---
+
+<h1 id="_top">{data.title}</h1>
+{data.description && <p class="page-summary">{data.description}</p>}
+{showMeta && <ArticleMeta />}

@@ -1,0 +1,85 @@
+---
+import { categories, getCategory, isCategorySlug } from '../../config/categories';
+import { platformLabels, platforms, statusLabels, statuses } from '../../config/labels';
+import { getArticlesInCategory } from '../../lib/content';
+import ArticleCard from './ArticleCard.astro';
+import EmptyState from '../ui/EmptyState.astro';
+
+const categorySlug = Astro.locals.starlightRoute.entry.data.category;
+if (!categorySlug || !isCategorySlug(categorySlug)) {
+	throw new Error('Halaman kategori tidak memiliki slug registry.');
+}
+const category = getCategory(categorySlug);
+const articles = await getArticlesInCategory(categorySlug);
+---
+
+<div class="category-listing" data-article-filters data-current-category={categorySlug}>
+	<p class="meta-line">{articles.length} artikel publik dalam {category?.label}.</p>
+	<form class="filter-bar">
+		<label>
+			Kategori
+			<select name="category" data-filter="category">
+				{
+					categories.map((item) => (
+						<option value={item.slug} selected={item.slug === categorySlug}>
+							{item.label}
+						</option>
+					))
+				}
+			</select>
+		</label>
+		<label>
+			Platform
+			<select name="platform" data-filter="platform">
+				<option value="">Semua platform</option>
+				{platforms.map((platform) => <option value={platform}>{platformLabels[platform]}</option>)}
+			</select>
+		</label>
+		<label>
+			Status
+			<select name="status" data-filter="status">
+				<option value="">Semua status</option>
+				{statuses.map((status) => <option value={status}>{statusLabels[status]}</option>)}
+			</select>
+		</label>
+	</form>
+	<noscript>
+		<p>Penyaringan platform dan status membutuhkan JavaScript. Seluruh daftar artikel tetap ditampilkan.</p>
+		<ul class="category-links">
+			{
+				categories.map((item) => (
+					<li>
+						<a href={`/${item.slug}/`}>{item.label}</a>
+					</li>
+				))
+			}
+		</ul>
+	</noscript>
+	<p class="visually-hidden" data-filter-status role="status" aria-live="polite"></p>
+	{
+		articles.length === 0 ? (
+			<EmptyState title="Belum ada artikel">
+				<p>Kategori ini belum memiliki artikel publik.</p>
+			</EmptyState>
+		) : (
+			<ul class="article-list">
+				{articles.map((entry) => (
+					<li>
+						<ArticleCard entry={entry} />
+					</li>
+				))}
+			</ul>
+		)
+	}
+	<div data-filter-empty hidden>
+		<EmptyState title="Tidak ada artikel untuk filter ini">
+			<p>Ubah platform atau status, atau lihat seluruh daftar dengan menghapus filter.</p>
+		</EmptyState>
+	</div>
+</div>
+
+<script>
+	import { initFilters } from '../../scripts/filters';
+
+	initFilters();
+</script>

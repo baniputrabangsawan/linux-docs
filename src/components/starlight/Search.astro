@@ -1,0 +1,85 @@
+---
+import { categories } from '../../config/categories';
+import { platformLabels, statusLabels } from '../../config/labels';
+import OutlineIcon from '../ui/OutlineIcon.astro';
+
+const labels = {
+	categories: Object.fromEntries(categories.map((category) => [category.slug, category.label])),
+	platforms: platformLabels,
+	statuses: statusLabels,
+};
+---
+
+<button
+	type="button"
+	class="search-icon-button"
+	data-search-open
+	aria-label="Cari dokumentasi"
+	aria-keyshortcuts="Control+K Meta+K"
+	aria-haspopup="dialog"
+>
+	<OutlineIcon name="search" />
+</button>
+
+<dialog id="site-search-dialog" aria-labelledby="search-dialog-title" data-labels={JSON.stringify(labels)}>
+	<header class="search-dialog-head">
+		<h2 id="search-dialog-title">Cari dokumentasi</h2>
+		<button type="button" class="dialog-close" data-search-close aria-label="Tutup pencarian">
+			<span class="dialog-close-visual">
+				<OutlineIcon name="close" size={16} />
+			</span>
+		</button>
+	</header>
+	<form role="search" data-search-form>
+		<label class="search-field" for="site-search-input">
+			<span class="visually-hidden">Cari dokumentasi</span>
+			<OutlineIcon name="search" size={18} />
+			<input
+				id="site-search-input"
+				type="search"
+				name="q"
+				autocomplete="off"
+				spellcheck="false"
+				enterkeyhint="search"
+				placeholder="Judul, pesan error, atau kata kunci"
+				aria-autocomplete="list"
+				aria-controls="search-results"
+				aria-expanded="false"
+			/>
+			<button type="button" class="search-clear" data-search-clear aria-label="Hapus pencarian" hidden>
+				<OutlineIcon name="close" size={16} />
+			</button>
+		</label>
+	</form>
+	<div class="search-body">
+		<p id="search-status" class="search-status" role="status" aria-live="polite" data-state="initial">
+			Cari solusi berdasarkan judul atau pesan error
+		</p>
+		<div class="search-error" data-search-error hidden>
+			<button type="button" class="retry-button" data-search-retry>Coba lagi</button>
+			<a class="search-explore" href="/dashboard/">Jelajahi kategori</a>
+		</div>
+		<ul id="search-results" class="search-results" role="listbox" aria-label="Hasil pencarian"></ul>
+		<nav class="search-chips" data-search-categories aria-label="Kategori">
+			{
+				categories.map((category) => (
+					<a class="search-chip" href={`/${category.slug}/`}>
+						{category.label}
+					</a>
+				))
+			}
+		</nav>
+	</div>
+	<footer class="search-footer">
+		<span><kbd data-search-mod>Ctrl</kbd><kbd>K</kbd> membuka</span>
+		<span><kbd>↑</kbd><kbd>↓</kbd> memilih</span>
+		<span><kbd>Enter</kbd> membuka</span>
+		<span><kbd>Esc</kbd> menutup</span>
+	</footer>
+</dialog>
+
+<script>
+	import { initSearch } from '../../scripts/search';
+
+	initSearch();
+</script>

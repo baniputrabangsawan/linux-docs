@@ -1,0 +1,131 @@
+.os-name,
+.os-count,
+[data-os-list],
+.os-empty {
+	display: none;
+}
+
+html:not([data-os]) .os-name[data-os-name='all'],
+html:not([data-os]) .os-count[data-os-count='all'],
+html:not([data-os]) .os-name[data-os-name='all'],
+html:not([data-os]) .os-count[data-os-count='all'] {
+	display: inline;
+}
+
+html:not([data-os]) [data-os-list='all'] {
+	display: grid;
+}
+
+html[data-os='linux'] .os-name[data-os-name='linux'],
+html[data-os='windows'] .os-name[data-os-name='windows'],
+html[data-os='macos'] .os-name[data-os-name='macos'],
+html[data-os='all'] .os-name[data-os-name='all'] {
+	display: inline;
+}
+
+html[data-os='linux'] .os-count[data-os-count='linux'],
+html[data-os='windows'] .os-count[data-os-count='windows'],
+html[data-os='macos'] .os-count[data-os-count='macos'],
+html[data-os='all'] .os-count[data-os-count='all'] {
+	display: inline;
+}
+
+html[data-os='linux'] [data-os-list='linux'],
+html[data-os='windows'] [data-os-list='windows'],
+html[data-os='macos'] [data-os-list='macos'],
+html[data-os='all'] [data-os-list='all'] {
+	display: grid;
+}
+
+html[data-os='linux'] .os-empty[data-os-empty='linux'],
+html[data-os='windows'] .os-empty[data-os-empty='windows'],
+html[data-os='macos'] .os-empty[data-os-empty='macos'],
+html[data-os='all'] .os-empty[data-os-empty='all'] {
+	display: block;
+}
+
+html[data-os='linux'] [data-visible-linux='0'],
+html[data-os='windows'] [data-visible-windows='0'],
+html[data-os='macos'] [data-visible-macos='0'],
+html[data-os='all'] [data-visible-all='0'] {
+	display: none;
+}
+
+html[data-os='linux'] [data-os-item]:not([data-platforms~='linux']):not([data-platforms~='lintas-platform']),
+html[data-os='windows'] [data-os-item]:not([data-platforms~='windows']):not([data-platforms~='lintas-platform']),
+html[data-os='macos'] [data-os-item]:not([data-platforms~='macos']):not([data-platforms~='lintas-platform']) {
+	display: none;
+}
+
+html[data-os='linux'] li:has(> [data-os-item]:not([data-platforms~='linux']):not([data-platforms~='lintas-platform'])),
+html[data-os='windows'] li:has(> [data-os-item]:not([data-platforms~='windows']):not([data-platforms~='lintas-platform'])),
+html[data-os='macos'] li:has(> [data-os-item]:not([data-platforms~='macos']):not([data-platforms~='lintas-platform'])) {
+	display: none;
+}
+
+.os-banner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem 1rem;
+	margin: 0 0 1.5rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	background: #ffffff;
+}
+
+.os-banner p {
+	margin: 0;
+	color: #18181b;
+	font-size: 0.875rem;
+}
+
+.os-change {
+	color: #3f6212;
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.os-change:hover {
+	text-decoration: underline;
+}
+
+.os-mismatch {
+	display: none;
+	margin: 0.75rem 0 0;
+	color: #52525b;
+	font-size: 0.875rem;
+}
+
+html[data-os='linux'] .os-mismatch[data-os-mismatch='linux'],
+html[data-os='windows'] .os-mismatch[data-os-mismatch='windows'],
+html[data-os='macos'] .os-mismatch[data-os-mismatch='macos'] {
+	display: block;
+}
+
+.os-note {
+	margin: 1rem 0 0;
+	color: #52525b;
+	font-size: 0.875rem;
+}
+
+.stat-card .os-count,
+.card-count .os-count {
+	display: none;
+}
+
+html:not([data-os]) .stat-card .os-count[data-os-count='all'],
+html:not([data-os]) .card-count .os-count[data-os-count='all'],
+html[data-os='linux'] .stat-card .os-count[data-os-count='linux'],
+html[data-os='linux'] .card-count .os-count[data-os-count='linux'],
+html[data-os='windows'] .stat-card .os-count[data-os-count='windows'],
+html[data-os='windows'] .card-count .os-count[data-os-count='windows'],
+html[data-os='macos'] .stat-card .os-count[data-os-count='macos'],
+html[data-os='macos'] .card-count .os-count[data-os-count='macos'],
+html[data-os='all'] .stat-card .os-count[data-os-count='all'],
+html[data-os='all'] .card-count .os-count[data-os-count='all'] {
+	display: inline;
+}
